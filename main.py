@@ -63,6 +63,7 @@ class Game:
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'images')
         self.player_img = pg.image.load(path.join(img_folder, 'monkey.png')).convert_alpha()
+        self.mob1_img = pg.image.load(path.join(img_folder, 'mob1.png')).convert_alpha()
         self.map_data = []
  
         '''
@@ -154,7 +155,8 @@ class Game:
         self.screen.fill(BGCOLOR)
         self.draw_grid()
         self.all_sprites.draw(self.screen)
-        self.draw_text(self.screen, str(self.player.moneybag), 64, WHITE, 1, 1)
+        self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1, 1)
+        self.draw_text(self.screen, str(self.player.health), 32, WHITE, 30, 1)
 
         pg.display.flip()
 

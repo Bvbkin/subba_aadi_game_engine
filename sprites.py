@@ -64,8 +64,9 @@ class Player(pg.sprite.Sprite):
             if str(hits[0].__class__.__name__) == "Coin":
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "PowerUps":
-                self.speed += 200
-            
+                self.speed += 100
+            if str(hits[0].__class__.__name__) == "mobs":
+                self.health -= 20
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
@@ -149,7 +150,8 @@ class Mob(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
+        self.image = game.mob1_img
+        # self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -178,6 +180,9 @@ class Mob(pg.sprite.Sprite):
         if self.rect.y > HEIGHT or self.rect.y < 0:
             self.speed *= -1
     '''
+
+
+
     def update(self):
         # self.rect.x += 1
         self.x += self.vx * self.game.dt
