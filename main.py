@@ -85,6 +85,7 @@ class Game:
         self.coins = pg.sprite.Group()
         self.powerups = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
+        self.pew_pews = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -183,14 +184,31 @@ class Game:
             
     
     def show_start_screen(self):
-        pass
+        self.screen.fill(BGCOLOR)
+        self.draw_text(self.screen, "This is the start screen - press any key to play", 24, WHITE, WIDTH/2, HEIGHT/2)
+        pg.display.flip()
+        self.wait_for_key()
 
-    def show_go_screen(self):
-        pass
+    def show_death_screen(self):
+        self.screen.fill(BGCOLOR)
+        self.draw_text(self.screen, "This is the end screen - thank you for playing!", 24, WHITE, WIDTH/2, HEIGHT/2)
+        pg.display.flip()
+        pg.quit()
+    
+    def wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.quit()
+                if event.type == pg.KEYUP:
+                    waiting = False
 
 # call the class to run it
 g = Game()
-# g.show_start_screen()
+g.show_start_screen()
 
 while True:
     g.new()
