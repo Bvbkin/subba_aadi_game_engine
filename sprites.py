@@ -33,8 +33,13 @@ class Player(pg.sprite.Sprite):
             self.vy = -self.speed
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vy = self.speed
-        if keys[pg.K_e]:
+        if keys[pg.K_SPACE]:
             self.pew()
+
+    def pew(self):
+        p = PewPew(self.game, self.rect.x, self.rect.y)
+        print(p.rect.x)
+        print(p.rect.y)
         
 
     # collision for player & walls
@@ -65,8 +70,8 @@ class Player(pg.sprite.Sprite):
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "PowerUps":
                 self.speed += 100
-            if str(hits[0].__class__.__name__) == "mobs":
-                self.health -= 20
+            if str(hits[0].__class__.__name__) == "Mob":
+                self.health -= 1
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
@@ -78,7 +83,8 @@ class Player(pg.sprite.Sprite):
                 if self.vx < 0:
                     self.x = hits[0].rect.right
                 self.vx = 0
-                self.rect.x = self.x
+                self.rect.x = self
+
         if dir == 'y':
             hits = pg.sprite.spritecollide(self, self.game.mobs, False)
             if hits:
@@ -118,7 +124,6 @@ class Player(pg.sprite.Sprite):
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
         #     print("I got a coin")
-
 
 # write a wall class
 class Wall(pg.sprite.Sprite):
@@ -227,5 +232,24 @@ class PowerUps(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-class PewPew():
-    pass
+class PewPew(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.pew_pews
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/4, TILESIZE/4))
+        self.image.fill(ORANGE)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = 10
+
+    def collide_with_group(self, group, kill):
+        hits = pg.sprite.spritecollide(self, group, kill)
+
+    def update(self):
+        self.collide_with_group(self.game.coins, True)
+        self.rect.y -= self.speed
+        # pass
