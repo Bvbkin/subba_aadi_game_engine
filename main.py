@@ -20,6 +20,16 @@ Following enemy
 Weapons and projectiles
 
 '''
+def draw_health_bar(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 32
+    BAR_HEIGHT = 10
+    fill = (pct / 100) * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    pg.draw.rect(surf, GREEN, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
 
 class Cooldown():
     # set all properties to zero when instantiated
@@ -57,6 +67,7 @@ class Game:
         self.running = True
         # stores game info with this, ex. high scores
         self.load_data()
+        self.playing = True
     
     # importing map data from the file map.txt
     def load_data(self):
@@ -86,6 +97,7 @@ class Game:
         self.powerups = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.pew_pews = pg.sprite.Group()
+        self.player = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -133,6 +145,8 @@ class Game:
     # updates the position of all sprites on the grid
     def update(self):
         self.all_sprites.update()
+        if self.player.health <= 0:
+            self.playing = False
         
 
     # draws the grid for our game
@@ -157,7 +171,7 @@ class Game:
         self.draw_grid()
         self.all_sprites.draw(self.screen)
         self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1, 1)
-        self.draw_text(self.screen, str(self.player.health), 32, WHITE, 30, 1)
+        draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
 
         pg.display.flip()
 
@@ -185,15 +199,17 @@ class Game:
     
     def show_start_screen(self):
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "This is the start screen - press any key to play", 24, WHITE, WIDTH/2, HEIGHT/2)
+        self.draw_text(self.screen, "This is the start screen - press any key to play!", 24, WHITE, WIDTH/2, HEIGHT/2)
         pg.display.flip()
         self.wait_for_key()
 
-    def show_death_screen(self):
+    def show_go_screen(self):
+        if not self.playing:
+            return
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "This is the end screen - thank you for playing!", 24, WHITE, WIDTH/2, HEIGHT/2)
+        self.draw_text(self.screen, "You died - press any key to play again!", 24, WHITE, WIDTH/2, HEIGHT/2)
         pg.display.flip()
-        pg.quit()
+        self.wait_for_key()
     
     def wait_for_key(self):
         waiting = True
@@ -213,4 +229,4 @@ g.show_start_screen()
 while True:
     g.new()
     g.run()
-    # g.show_go_screen()
+    g.show_go_screen()

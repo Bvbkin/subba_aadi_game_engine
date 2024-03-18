@@ -1,6 +1,7 @@
 # This file was created by: Aadi Subba
 # Appreciation to Chris Bradfield
 import pygame as pg
+import sys
 from settings import *
 
 # write a player class
