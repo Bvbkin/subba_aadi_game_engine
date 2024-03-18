@@ -69,8 +69,13 @@ class Player(pg.sprite.Sprite):
         if hits:
             if str(hits[0].__class__.__name__) == "Coin":
                 self.moneybag += 1
-            if str(hits[0].__class__.__name__) == "PowerUps":
+            if str(hits[0].__class__.__name__) == "speedpotion":
                 self.speed += 100
+            if str(hits[0].__class__.__name__) == "healthpotion":
+                if self.health <= 80:
+                    self.health += 20
+                else:
+                    self.health += 100-self.health
             if str(hits[0].__class__.__name__) == "Mob":
                 self.health -= 1
 
@@ -120,7 +125,8 @@ class Player(pg.sprite.Sprite):
         # self.rect.x = self.x * TILESIZE
         # self.rect.y = self.y * TILESIZE
         self.collide_with_group(self.game.coins, True)
-        self.collide_with_group(self.game.powerups, True)
+        self.collide_with_group(self.game.speedpotion, True)
+        self.collide_with_group(self.game.healthpotion, True)
         self.collide_with_group(self.game.mobs, False)
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
@@ -187,8 +193,6 @@ class Mob(pg.sprite.Sprite):
             self.speed *= -1
     '''
 
-
-
     def update(self):
         # self.rect.x += 1
         self.x += self.vx * self.game.dt
@@ -220,9 +224,22 @@ class Coin(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-class PowerUps(pg.sprite.Sprite):
+class speedpotion(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.powerups
+        self.groups = game.all_sprites, game.speedpotion
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+
+class healthpotion(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.healthpotion
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))

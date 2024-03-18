@@ -94,7 +94,8 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
-        self.powerups = pg.sprite.Group()
+        self.speedpotion = pg.sprite.Group()
+        self.healthpotion = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.pew_pews = pg.sprite.Group()
         self.player = pg.sprite.Group()
@@ -118,8 +119,10 @@ class Game:
                     Mob(self,col,row)
                 if tile == 'C':
                     Coin(self,col,row)
-                if tile == 'U':
-                    PowerUps(self,col,row)
+                if tile == 's':
+                    speedpotion(self,col,row)
+                if tile == 'h':
+                    healthpotion(self,col,row)
 
     # runs the game, game won't run without it
     def run(self):
@@ -171,6 +174,7 @@ class Game:
         self.draw_grid()
         self.all_sprites.draw(self.screen)
         self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1, 1)
+        self.draw_text(self.screen, str(self.player.health), 32, WHITE, 30, 1)
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
 
         pg.display.flip()
