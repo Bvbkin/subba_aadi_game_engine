@@ -99,6 +99,7 @@ class Game:
         self.mobs = pg.sprite.Group()
         self.pew_pews = pg.sprite.Group()
         self.player = pg.sprite.Group()
+        self.sword = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -148,9 +149,8 @@ class Game:
     # updates the position of all sprites on the grid
     def update(self):
         self.all_sprites.update()
-        if self.player.health <= 0:
-            self.playing = False
-        
+        if self.player.health < 1:
+            self.playing = False  
 
     # draws the grid for our game
     def draw_grid(self):
@@ -160,6 +160,7 @@ class Game:
         for y in range (0,HEIGHT,TILESIZE):
             pg.draw.line(self.screen, LIGHTGREY, (0,y), (WIDTH,y))
 
+    # sets text settings
     def draw_text(self, surface, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
@@ -173,8 +174,9 @@ class Game:
         self.screen.fill(BGCOLOR)
         self.draw_grid()
         self.all_sprites.draw(self.screen)
+        # paints moneybag amount
         self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1, 1)
-        self.draw_text(self.screen, str(self.player.health), 32, WHITE, 30, 1)
+        # paints a health bar on top of player
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
 
         pg.display.flip()
@@ -200,21 +202,23 @@ class Game:
             #     if event.key == pg.K_DOWN:
             #         self.player.move(dy=+1)
             
-    
+    # start screen
     def show_start_screen(self):
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "This is the start screen - press any key to play!", 24, WHITE, WIDTH/2, HEIGHT/2)
+        self.draw_text(self.screen, "This is the start screen - press any key to play", 50, WHITE, WIDTH/1000, HEIGHT/1000)
         pg.display.flip()
         self.wait_for_key()
 
+    # death screen
     def show_go_screen(self):
         if not self.playing:
             return
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "You died - press any key to play again!", 24, WHITE, WIDTH/2, HEIGHT/2)
+        self.draw_text(self.screen, "You died - press any key to play again!", 24, WHITE, WIDTH/1000, HEIGHT/1000)
         pg.display.flip()
         self.wait_for_key()
     
+    # waits for pressed key in order to start game
     def wait_for_key(self):
         waiting = True
         while waiting:
@@ -228,8 +232,8 @@ class Game:
 
 # call the class to run it
 g = Game()
-g.show_start_screen()
 
+g.show_start_screen()
 while True:
     g.new()
     g.run()
