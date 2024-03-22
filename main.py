@@ -20,6 +20,8 @@ Following enemy
 Obstacle
 
 '''
+
+# create the health bar above player
 def draw_health_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
@@ -28,6 +30,7 @@ def draw_health_bar(surf, x, y, pct):
     fill = (pct / 100) * BAR_LENGTH
     outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    # set colors for health bar
     if pct >= 80:
         pg.draw.rect(surf, GREEN, fill_rect)
     elif pct < 80 and pct >= 30:
@@ -75,6 +78,7 @@ class Game:
         self.playing = True
     
     # importing map data from the file map.txt
+    # import images to sprites
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'images')
@@ -98,7 +102,7 @@ class Game:
                 print(line)
                 self.map_data.append(line)
 
-    # add player sprite to Group
+    # add sprite classes to Group
     def new(self):
         self.test_timer = Cooldown()
         self.all_sprites = pg.sprite.Group()
@@ -118,6 +122,8 @@ class Game:
             #Wall(self,x,5)
         
         # might print walls
+        
+        # set locations for different sprites
         for row, tiles in enumerate(self.map_data):
             print(row)
             for col, tile in enumerate(tiles):
@@ -174,9 +180,9 @@ class Game:
         for y in range (0,HEIGHT,TILESIZE):
             pg.draw.line(self.screen, LIGHTGREY, (0,y), (WIDTH,y))
 
-    # sets text settings
+    # sets text settings, ex. font, size, color
     def draw_text(self, surface, text, size, color, x, y):
-        font_name = pg.font.match_font('arial')
+        font_name = pg.font.match_font('Times New Roman')
         font = pg.font.Font(font_name, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
@@ -216,7 +222,7 @@ class Game:
             #     if event.key == pg.K_DOWN:
             #         self.player.move(dy=+1)
             
-    # start screen
+    # creates a start screen
     def show_start_screen(self):
         self.screen.fill(BGCOLOR)
         self.draw_text(self.screen, "This is the start screen - press any key to play!", 50, WHITE, WIDTH/1000, HEIGHT/1000)
@@ -226,7 +232,7 @@ class Game:
         pg.display.flip()
         self.wait_for_key()
 
-    # death screen
+    # creates a death screen
     def show_go_screen(self):
         if self.playing == True:
             return
@@ -252,6 +258,8 @@ class Game:
 g = Game()
 
 g.show_start_screen()
+
+# while playing is True the game keeps running
 while True:
     g.new()
     g.run()

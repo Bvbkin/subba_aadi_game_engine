@@ -1,10 +1,11 @@
 # This file was created by: Aadi Subba
 # Appreciation to Chris Bradfield
 import pygame as pg
-import sys
+from sys import *
 from settings import *
 from random import randint
 
+# creates vectors for movement
 vec = pg.math.Vector2
 
 # write a player class
@@ -28,11 +29,14 @@ class Player(pg.sprite.Sprite):
         self.sword_dir = (0,0)
         self.sword = Sword(self.game, self.rect.x, self.rect.y, 16, 16, (0,0))
 
+    # sets direction
     def set_dir(self, d):
         self.dir = d
         # return (0,0)
+    # gets direction
     def get_dir(self):
         return self.dir
+    # gets mouse input
     def get_mouse(self):
         if pg.mouse.get_pressed()[0]:
             # mx = pg.mouse.get_pos()[0]
@@ -147,6 +151,7 @@ class Player(pg.sprite.Sprite):
     # new motion
 
     # UPDATE THE UPDATE
+    # runs all function inside player class
     def update(self):
         # self.rect.x = self.x
         # self.rect.y = self.y
@@ -182,6 +187,8 @@ class Wall(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.speed = 0
+    
+    # updates the walls
     def update(self):
         # self.rect.x += 1
         self.rect.x += TILESIZE * self.speed
@@ -209,6 +216,8 @@ class Mob(pg.sprite.Sprite):
         self.speed = (4,7)
         self.health = 5
         print("created mob at", self.rect.x, self.rect.y)
+    
+    # creates mob + wall collision
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
@@ -228,6 +237,8 @@ class Mob(pg.sprite.Sprite):
                     self.y = hits[0].rect.bottom
                 self.vy = 0
                 self.rect.y = self.y
+    
+    # using player location to chase player
     def chasing(self):
         if self.rect.x < self.game.player.rect.x:
             self.vx = 100
@@ -237,6 +248,8 @@ class Mob(pg.sprite.Sprite):
             self.vy = 100
         if self.rect.y > self.game.player.rect.y:
             self.vy = -100
+    
+    # updates functions inside mob class
     def update(self):
         if self.health < 1:
             self.kill()
@@ -346,7 +359,7 @@ class healthpotion(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-# class for sword
+# creates a class for sword
 class Sword(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h, dir):
         self.groups = game.all_sprites, game.sword
@@ -367,6 +380,8 @@ class Sword(pg.sprite.Sprite):
         self.pos = vec(x,y)
         self.dir = dir
         print("I created a sword")
+    
+    # sword and mob collision
     def collide_with_group(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
         if hits:
@@ -376,11 +391,15 @@ class Sword(pg.sprite.Sprite):
             # if str(hits[0].__class__.__name__) == "Mob2":
                 # print("you hurt a mob!")
                 # hits[0].health -= 1
+    
+    # tracks the movement/location of sword
     def track(self, obj):
         self.vx = obj.vx
         self.vy = obj.vy
         self.rect.width = obj.rect.x+self.dir[0]*32+5
         self.rect.width = obj.rect.y*self.dir[1]*32+5
+    
+    # updates the functions and sword
     def update(self):
         if self.game.player.sword_drawn == False:
             self.kill()
@@ -485,6 +504,7 @@ class poisoncloud(pg.sprite.Sprite):
         self.collide_with_walls('y')
 '''
 
+# class for poison cloud
 class poisoncloud(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.poisoncloud
@@ -535,6 +555,7 @@ class poisoncloud(pg.sprite.Sprite):
                 self.rect.y = self.y
 
     # UPDATE THE UPDATE
+    # calls the functions inside poison cloud and updates it
     def update(self):
         # self.rect.x = self.x
         # self.rect.y = self.y
