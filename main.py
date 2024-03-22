@@ -30,9 +30,9 @@ def draw_health_bar(surf, x, y, pct):
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
     if pct >= 80:
         pg.draw.rect(surf, GREEN, fill_rect)
-    elif pct < 80 and pct >= 50:
+    elif pct < 80 and pct >= 30:
         pg.draw.rect(surf, YELLOW, fill_rect)
-    elif pct < 50:
+    elif pct < 30:
         pg.draw.rect(surf, RED, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 
@@ -219,7 +219,10 @@ class Game:
     # start screen
     def show_start_screen(self):
         self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "This is the start screen - press any key to play", 50, WHITE, WIDTH/1000, HEIGHT/1000)
+        self.draw_text(self.screen, "This is the start screen - press any key to play!", 50, WHITE, WIDTH/1000, HEIGHT/1000)
+        self.draw_text(self.screen, "Use WASD to control the player.", 50, WHITE, WIDTH/1000, HEIGHT/250)
+        self.draw_text(self.screen, "Use the arrow keys to control the storm.", 50, WHITE, WIDTH/1000, HEIGHT/150)
+        self.draw_text(self.screen, "Don't die!", 50, WHITE, WIDTH/1000, HEIGHT/100)
         pg.display.flip()
         self.wait_for_key()
 

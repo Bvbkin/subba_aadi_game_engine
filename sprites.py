@@ -206,7 +206,7 @@ class Mob(pg.sprite.Sprite):
         self.vx, self.vy = 100, 100
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.speed = (2,5)
+        self.speed = (4,7)
         self.health = 5
         print("created mob at", self.rect.x, self.rect.y)
     def collide_with_walls(self, dir):
@@ -513,7 +513,7 @@ class poisoncloud(pg.sprite.Sprite):
         if keys[pg.K_DOWN]:
             self.vy = self.speed
 
-    # collision for player & walls
+    # collision for storm & walls
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
