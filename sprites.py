@@ -3,6 +3,7 @@
 import pygame as pg
 import sys
 from settings import *
+from random import randint
 
 vec =pg.math.Vector2
 
@@ -171,7 +172,7 @@ class Wall(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image.fill(BLUE)
+        self.image = game.wall_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -187,13 +188,14 @@ class Wall(pg.sprite.Sprite):
         # if self.rect.y > HEIGHT or self.rect.y < 0:
             # self.speed *= -1
 
+
 # creating an enemy class
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = pg.Surface((TILESIZE, TILESIZE))
         # self.image.fill(RED)
         self.image = self.game.mob1_img
         self.rect = self.image.get_rect()
@@ -202,34 +204,29 @@ class Mob(pg.sprite.Sprite):
         self.vx, self.vy = 100, 100
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.speed = 350
+        self.speed = (1,3)
         self.health = 5
-    
-    # enemy wall collision
+        print("created mob at", self.rect.x, self.rect.y)
     def collide_with_walls(self, dir):
         if dir == 'x':
-            # print('colliding on the x')
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
-                self.vx *= -1
+                if self.vx > 0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
                 self.rect.x = self.x
         if dir == 'y':
-            # print('colliding on the y')
             hits = pg.sprite.spritecollide(self, self.game.walls, False)
             if hits:
-                self.vy *= -1
+                if self.vy > 0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hits[0].rect.bottom
+                self.vy = 0
                 self.rect.y = self.y
-    
-    # updates status of enemy
-    def update(self):
-        if self.health < 1:
-            self.kill()
-        # self.image.blit(self.game.screen, self.pic)
-        # pass
-        # # self.rect.x += 1
-        self.x += self.vx * self.game.dt
-        self.y += self.vy * self.game.dt
-        
+    def chasing(self):
         if self.rect.x < self.game.player.rect.x:
             self.vx = 100
         if self.rect.x > self.game.player.rect.x:
@@ -238,11 +235,22 @@ class Mob(pg.sprite.Sprite):
             self.vy = 100
         if self.rect.y > self.game.player.rect.y:
             self.vy = -100
+    def update(self):
+        if self.health < 1:
+            self.kill()
+        # self.image.blit(self.game.screen, self.pic)
+        # pass
+        # self.rect.x += 1
+        self.chasing()
+        self.x += self.vx * self.game.dt
+        self.y += self.vy * self.game.dt
         self.rect.x = self.x
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
 
+
+'''
 class Mob2(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
@@ -251,7 +259,7 @@ class Mob2(pg.sprite.Sprite):
         # self.image = game.mob_img
         # self.image = pg.Surface((TILESIZE, TILESIZE))
         # self.image.fill(ORANGE)
-        self.image = self.game.mob2_img
+        self.image = self.game.mob1_img
         # self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
@@ -266,19 +274,20 @@ class Mob2(pg.sprite.Sprite):
         self.speed = 100
         self.chasing = True
         # self.health = MOB_HEALTH
-        self.hitpoints = 5
+        self.health = 5
     def sensor(self):
         if abs(self.rect.x - self.game.player.rect.x) < self.chase_distance and abs(self.rect.y - self.game.player.rect.y) < self.chase_distance:
             self.chasing = True
         else:
             self.chasing = False
+    
     def update(self):
-        if self.hitpoints <= 0:
+        if self.health <= 0:
             self.kill()
         # self.sensor()
         if self.chasing:
             self.rot = (self.game.player.rect.center - self.pos).angle_to(vec(1, 0))
-            self.image = pg.transform.rotate(self.game.mob2_img, self.rot)
+            self.image = pg.transform.rotate(self.game.mob1_img, self.rot)
             self.rect = self.image.get_rect()
             self.rect.center = self.pos
             self.acc = vec(self.speed, 0).rotate(-self.rot)
@@ -288,11 +297,12 @@ class Mob2(pg.sprite.Sprite):
             self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
             # hit_rect used to account for adjusting the square collision when image rotates
             self.hit_rect.centerx = self.pos.x
-            collide_with_walls(self, self.game.walls, 'x')
+            self.collide_with_walls('x')
             self.hit_rect.centery = self.pos.y
-            collide_with_walls(self, self.game.walls, 'y')
+            self.collide_with_walls('y')
             self.rect.center = self.hit_rect.center
-
+'''
+            
 # create a coin class
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -314,7 +324,7 @@ class speedpotion(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
+        self.image = game.speedpotion_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
@@ -328,7 +338,7 @@ class healthpotion(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.image = game.medkit_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y

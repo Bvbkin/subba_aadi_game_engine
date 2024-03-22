@@ -17,7 +17,7 @@ goals, rules, feedback, freedom, whats the verb, and will it form a sentence
 
 Health Bar
 Following enemy
-Weapons and projectiles
+Level system
 
 '''
 def draw_health_bar(surf, x, y, pct):
@@ -76,6 +76,9 @@ class Game:
         self.player_img = pg.image.load(path.join(img_folder, 'monkey.png')).convert_alpha()
         self.mob1_img = pg.image.load(path.join(img_folder, 'mob1.png')).convert_alpha()
         self.banana_img = pg.image.load(path.join(img_folder, 'banana.png')).convert_alpha()
+        self.wall_img = pg.image.load(path.join(img_folder, 'wall.jpg')).convert_alpha()
+        self.medkit_img = pg.image.load(path.join(img_folder, 'medkit.png')).convert_alpha()
+        self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
         self.map_data = []
  
         '''
@@ -176,7 +179,7 @@ class Game:
         self.draw_grid()
         self.all_sprites.draw(self.screen)
         # paints moneybag amount
-        self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1, 1)
+        self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1.5, 1)
         # paints a health bar on top of player
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
 

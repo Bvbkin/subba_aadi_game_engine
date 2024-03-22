@@ -1,3 +1,5 @@
+import pygame as pg
+
 WIDTH = 1024
 HEIGHT = 768
 
@@ -11,6 +13,8 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 BLUE = (0,0,255)
 ORANGE = (255,160,0)
+
+MOB_HIT_RECT = pg.Rect(0,0,96,96)
 
 FPS = 30
 
