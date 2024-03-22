@@ -64,13 +64,13 @@ class Player(pg.sprite.Sprite):
     def get_keys(self):
         self.vx, self.vy = 0, 0
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
+        if keys[pg.K_a]:
             self.vx = -self.speed
-        if keys[pg.K_RIGHT] or keys[pg.K_d]:
+        if keys[pg.K_d]:
             self.vx = self.speed
-        if keys[pg.K_UP] or keys[pg.K_w]:
+        if keys[pg.K_w]:
             self.vy = -self.speed
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
+        if keys[pg.K_s]:
             self.vy = self.speed
 
     # collision for player & walls
@@ -436,19 +436,19 @@ class Shield(pg.sprite.Sprite):
         self.rect.y = self.y
         self.collide_with_group(self.game.mobs, False)
 '''
-
+'''
 class poisoncloud(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.poisoncloud
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, 3*TILESIZE))
+        self.image = pg.Surface((TILESIZE, TILESIZE))
         # self.image.fill(RED)
         self.image = self.game.poison_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
-        self.vx, self.vy = 100, 100
+        # self.vx, self.vy = 100, 100
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         print("created cloud at", self.rect.x, self.rect.y)
@@ -483,4 +483,68 @@ class poisoncloud(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
+'''
+
+class poisoncloud(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.poisoncloud
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        # self.image = pg.Surface((TILESIZE,TILESIZE))
+        self.image = game.poison_img
+        # self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.speed = 250
+
+    # movement with WASD
+    def get_keys(self):
+        self.vx, self.vy = 0, 0
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LEFT]:
+            self.vx = -self.speed
+        if keys[pg.K_RIGHT]:
+            self.vx = self.speed
+        if keys[pg.K_UP]:
+            self.vy = -self.speed
+        if keys[pg.K_DOWN]:
+            self.vy = self.speed
+
+    # collision for player & walls
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vx > 0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
+        if dir == 'y':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vy > 0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hits[0].rect.bottom
+                self.vy = 0
+                self.rect.y = self.y
+
+    # UPDATE THE UPDATE
+    def update(self):
+        # self.rect.x = self.x
+        # self.rect.y = self.y
+        self.get_keys()
+        self.x += self.vx * self.game.dt
+        self.y += self.vy * self.game.dt
+        self.rect.x = self.x
+        self.collide_with_walls('x')
+        self.rect.y = self.y
+        self.collide_with_walls('y')
+        # self.rect.x = self.x * TILESIZE
+        # self.rect.y = self.y * TILESIZE
 
