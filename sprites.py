@@ -5,7 +5,7 @@ import sys
 from settings import *
 from random import randint
 
-vec =pg.math.Vector2
+vec = pg.math.Vector2
 
 # write a player class
 class Player(pg.sprite.Sprite):
@@ -110,7 +110,7 @@ class Player(pg.sprite.Sprite):
                 else:
                     self.health += 100-self.health
             if str(hits[0].__class__.__name__) == "Mob":
-                self.health -= 1
+                self.health -= 4
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
@@ -188,7 +188,6 @@ class Wall(pg.sprite.Sprite):
         # if self.rect.y > HEIGHT or self.rect.y < 0:
             # self.speed *= -1
 
-
 # creating an enemy class
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -204,7 +203,7 @@ class Mob(pg.sprite.Sprite):
         self.vx, self.vy = 100, 100
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.speed = (1,3)
+        self.speed = (2,5)
         self.health = 5
         print("created mob at", self.rect.x, self.rect.y)
     def collide_with_walls(self, dir):
@@ -248,7 +247,6 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
-
 
 '''
 class Mob2(pg.sprite.Sprite):

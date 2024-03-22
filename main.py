@@ -215,12 +215,13 @@ class Game:
 
     # death screen
     def show_go_screen(self):
-        if not self.playing:
+        if self.playing == True:
             return
-        self.screen.fill(BGCOLOR)
-        self.draw_text(self.screen, "You died - press any key to play again!", 24, WHITE, WIDTH/1000, HEIGHT/1000)
-        pg.display.flip()
-        self.wait_for_key()
+        else: 
+            self.screen.fill(BGCOLOR)
+            self.draw_text(self.screen, "You died - press any key to play again!", 50, WHITE, WIDTH/1000, HEIGHT/1000)
+            pg.display.flip()
+            self.wait_for_key()
     
     # waits for pressed key in order to start game
     def wait_for_key(self):
