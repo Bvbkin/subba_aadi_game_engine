@@ -75,6 +75,7 @@ class Game:
         img_folder = path.join(game_folder, 'images')
         self.player_img = pg.image.load(path.join(img_folder, 'monkey.png')).convert_alpha()
         self.mob1_img = pg.image.load(path.join(img_folder, 'mob1.png')).convert_alpha()
+        self.banana_img = pg.image.load(path.join(img_folder, 'banana.png')).convert_alpha()
         self.map_data = []
  
         '''

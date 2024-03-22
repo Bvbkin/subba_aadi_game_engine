@@ -243,14 +243,64 @@ class Mob(pg.sprite.Sprite):
         self.rect.y = self.y
         self.collide_with_walls('y')
 
+class Mob2(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.mobs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        # self.image = game.mob_img
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        # self.image.fill(ORANGE)
+        self.image = self.game.mob2_img
+        # self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.hit_rect = MOB_HIT_RECT.copy()
+        self.hit_rect.center = self.rect.center
+        self.pos = vec(x, y) * TILESIZE
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.rect.center = self.pos
+        self.rot = 0
+        self.chase_distance = 500
+        # added
+        self.speed = 100
+        self.chasing = True
+        # self.health = MOB_HEALTH
+        self.hitpoints = 5
+    def sensor(self):
+        if abs(self.rect.x - self.game.player.rect.x) < self.chase_distance and abs(self.rect.y - self.game.player.rect.y) < self.chase_distance:
+            self.chasing = True
+        else:
+            self.chasing = False
+    def update(self):
+        if self.hitpoints <= 0:
+            self.kill()
+        # self.sensor()
+        if self.chasing:
+            self.rot = (self.game.player.rect.center - self.pos).angle_to(vec(1, 0))
+            self.image = pg.transform.rotate(self.game.mob2_img, self.rot)
+            self.rect = self.image.get_rect()
+            self.rect.center = self.pos
+            self.acc = vec(self.speed, 0).rotate(-self.rot)
+            self.acc += self.vel * -1
+            self.vel += self.acc * self.game.dt
+            # equation of motion
+            self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+            # hit_rect used to account for adjusting the square collision when image rotates
+            self.hit_rect.centerx = self.pos.x
+            collide_with_walls(self, self.game.walls, 'x')
+            self.hit_rect.centery = self.pos.y
+            collide_with_walls(self, self.game.walls, 'y')
+            self.rect.center = self.hit_rect.center
+
 # create a coin class
 class Coin(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.coins
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
+        self.image = self.game.banana_img
+        # self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
