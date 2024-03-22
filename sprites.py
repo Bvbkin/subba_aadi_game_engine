@@ -111,6 +111,8 @@ class Player(pg.sprite.Sprite):
                     self.health += 100-self.health
             if str(hits[0].__class__.__name__) == "Mob":
                 self.health -= 4
+            if str(hits[0].__class__.__name__) == "poisoncloud":
+                self.health -= 5
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
@@ -161,6 +163,7 @@ class Player(pg.sprite.Sprite):
         self.collide_with_group(self.game.speedpotion, True)
         self.collide_with_group(self.game.healthpotion, True)
         self.collide_with_group(self.game.mobs, False)
+        self.collide_with_group(self.game.poisoncloud, False)
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
         #     print("I got a coin")
@@ -370,9 +373,9 @@ class Sword(pg.sprite.Sprite):
             if str(hits[0].__class__.__name__) == "Mob":
                 print("you hurt a mob!")
                 hits[0].health -= 1
-            if str(hits[0].__class__.__name__) == "Mob2":
-                print("you hurt a mob!")
-                hits[0].health -= 1
+            # if str(hits[0].__class__.__name__) == "Mob2":
+                # print("you hurt a mob!")
+                # hits[0].health -= 1
     def track(self, obj):
         self.vx = obj.vx
         self.vy = obj.vy
@@ -433,3 +436,51 @@ class Shield(pg.sprite.Sprite):
         self.rect.y = self.y
         self.collide_with_group(self.game.mobs, False)
 '''
+
+class poisoncloud(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.poisoncloud
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, 3*TILESIZE))
+        # self.image.fill(RED)
+        self.image = self.game.poison_img
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.vx, self.vy = 100, 100
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        print("created cloud at", self.rect.x, self.rect.y)
+    
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vx > 0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx += 0
+                self.rect.x = self.x
+        if dir == 'y':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vy > 0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hits[0].rect.bottom
+                self.vy += 0
+                self.rect.y = self.y\
+    
+    def update(self):
+        # self.image.blit(self.game.screen, self.pic)
+        # pass
+        # self.rect.x += 1
+        self.x += self.vx * self.game.dt
+        self.y += self.vy * self.game.dt
+        self.rect.x = self.x
+        self.collide_with_walls('x')
+        self.rect.y = self.y
+        self.collide_with_walls('y')
+

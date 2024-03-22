@@ -17,7 +17,7 @@ goals, rules, feedback, freedom, whats the verb, and will it form a sentence
 
 Health Bar
 Following enemy
-Level system
+Obstacle
 
 '''
 def draw_health_bar(surf, x, y, pct):
@@ -28,7 +28,12 @@ def draw_health_bar(surf, x, y, pct):
     fill = (pct / 100) * BAR_LENGTH
     outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
-    pg.draw.rect(surf, GREEN, fill_rect)
+    if pct >= 80:
+        pg.draw.rect(surf, GREEN, fill_rect)
+    elif pct < 80 and pct >= 50:
+        pg.draw.rect(surf, YELLOW, fill_rect)
+    elif pct < 50:
+        pg.draw.rect(surf, RED, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 
 class Cooldown():
@@ -79,6 +84,7 @@ class Game:
         self.wall_img = pg.image.load(path.join(img_folder, 'wall.jpg')).convert_alpha()
         self.medkit_img = pg.image.load(path.join(img_folder, 'medkit.png')).convert_alpha()
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
+        self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
         self.map_data = []
  
         '''
@@ -104,6 +110,7 @@ class Game:
         self.pew_pews = pg.sprite.Group()
         self.player = pg.sprite.Group()
         self.sword = pg.sprite.Group()
+        self.poisoncloud = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -128,6 +135,9 @@ class Game:
                     speedpotion(self,col,row)
                 if tile == 'h':
                     healthpotion(self,col,row)
+                if tile == 'o':
+                    poisoncloud(self,col,row)
+                
 
     # runs the game, game won't run without it
     def run(self):
@@ -179,7 +189,7 @@ class Game:
         self.draw_grid()
         self.all_sprites.draw(self.screen)
         # paints moneybag amount
-        self.draw_text(self.screen, str(self.player.moneybag), 32, WHITE, 1.5, 1)
+        self.draw_text(self.screen, str(self.player.moneybag), 35, YELLOW, 1.5, 1)
         # paints a health bar on top of player
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
 
