@@ -19,6 +19,13 @@ Health Bar
 Following enemy
 Obstacle
 
+BETA Goals:
+*Improve mob intelligence
+
+Gameplay goal: Level progression
+
+Secondary goal: add weapons and enemy health
+
 '''
 
 # create the health bar above player
@@ -89,6 +96,7 @@ class Game:
         self.medkit_img = pg.image.load(path.join(img_folder, 'medkit.png')).convert_alpha()
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
         self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
+        self.teleport_img = pg.image.load(path.join(img_folder, 'teleport.png')).convert_alpha()
         self.map_data = []
  
         '''
@@ -97,7 +105,7 @@ class Game:
     
         '''
         # open map.txt and add lines into list (line)
-        with open (path.join(game_folder, 'map.txt'), 'rt') as f:
+        with open (path.join(game_folder, 'map1.txt'), 'rt') as f:
             for line in f:
                 print(line)
                 self.map_data.append(line)
@@ -115,6 +123,8 @@ class Game:
         self.player = pg.sprite.Group()
         self.sword = pg.sprite.Group()
         self.poisoncloud = pg.sprite.Group()
+        self.teleport = pg.sprite.Group()
+        self.animated_sprite = Animated_sprite()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -143,7 +153,10 @@ class Game:
                     healthpotion(self,col,row)
                 if tile == 'o':
                     poisoncloud(self,col,row)
-                
+                if tile == 't' and self.player.moneybag == 10:
+                    Teleport(self,col,row)
+        self.all_sprites.add(self.animated_sprite)
+        self.run()
 
     # runs the game, game won't run without it
     def run(self):

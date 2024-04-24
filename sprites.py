@@ -4,6 +4,13 @@ import pygame as pg
 from sys import *
 from settings import *
 from random import randint
+from os import path
+from pygame.sprite import Sprite
+
+'''
+dir = path.dirname(__file__)
+img_dir = path.join(dir, 'images')
+'''
 
 # creates vectors for movement
 vec = pg.math.Vector2
@@ -105,7 +112,7 @@ class Player(pg.sprite.Sprite):
             if str(hits[0].__class__.__name__) == "Coin":
                 self.moneybag += 1
             if str(hits[0].__class__.__name__) == "speedpotion":
-                self.speed += 100
+                self.speed += 75
             if str(hits[0].__class__.__name__) == "healthpotion":
                 if self.health <= 80:
                     self.health += 20
@@ -274,7 +281,7 @@ class Mob2(pg.sprite.Sprite):
         # self.image = pg.Surface((TILESIZE, TILESIZE))
         # self.image.fill(ORANGE)
         self.image = self.game.mob1_img
-        # self.image.set_colorkey(BLACK)
+        # self.image.set_colorkey(BGCOLOR)
         self.rect = self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
@@ -518,7 +525,7 @@ class poisoncloud(pg.sprite.Sprite):
         self.vy = 0
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.speed = 250
+        self.speed = 300
 
     # movement with WASD
     def get_keys(self):
@@ -569,3 +576,110 @@ class poisoncloud(pg.sprite.Sprite):
         # self.rect.x = self.x * TILESIZE
         # self.rect.y = self.y * TILESIZE
 
+dir = path.dirname(__file__)
+img_dir = path.join(dir, 'images')
+
+class Spritesheet:
+    # utility class for loading and parsing spritesheets
+    def __init__(self, filename):
+        self.spritesheet = pg.image.load(filename).convert()
+
+    def get_image(self, x, y, width, height):
+        # grab an image out of a larger spritesheet
+        image = pg.Surface((width, height))
+        image.blit(self.spritesheet, (0, 0), (x, y, width, height))
+        # image = pg.transform.scale(image, (width, height))
+        image = pg.transform.scale(image, (width * 4, height * 4))
+        return image
+    
+class Animated_sprite(Sprite):
+    def __init__(self):
+        Sprite.__init__(self)
+        self.spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
+        self.load_images()
+        self.image = self.standing_frames[0]
+        self.rect = self.image.get_rect()
+        self.jumping = False
+        self.walking = False
+        self.current_frame = 0
+        self.last_update = 0
+        
+    def load_images(self):
+        self.standing_frames = [self.spritesheet.get_image(0, 0, 32, 32),
+                                self.spritesheet.get_image(32, 0, 32, 32)]
+        for frame in self.standing_frames:
+            frame.set_colorkey(BGCOLOR)
+        self.walk_frames_r = [self.spritesheet.get_image(678, 860, 120, 201),
+                              self.spritesheet.get_image(692, 1458, 120, 207)]
+        self.walk_frames_l = []
+        for frame in self.walk_frames_r:
+            frame.set_colorkey(BGCOLOR)
+            self.walk_frames_l.append(pg.transform.flip(frame, True, False))
+        self.jump_frame = self.spritesheet.get_image(256, 0, 128, 128)
+        self.jump_frame.set_colorkey(BGCOLOR)
+    def animate(self):
+        now = pg.time.get_ticks()
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 500:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                self.image = self.standing_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+        if self.jumping:
+            bottom = self.rect.bottom
+            self.image = self.jump_frame
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+    def update(self):
+        self.animate()
+
+
+class Teleport(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.teleport
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        # self.image = pg.Surface((TILESIZE,TILESIZE))
+        self.image = game.teleport_img
+        # self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+
+    # collision for teleport & walls
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vx > 0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
+        if dir == 'y':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vy > 0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hits[0].rect.bottom
+                self.vy = 0
+                self.rect.y = self.y
+
+    # UPDATE THE UPDATE
+    def update(self):
+        # self.rect.x = self.x
+        # self.rect.y = self.y
+        self.x += self.vx * self.game.dt
+        self.y += self.vy * self.game.dt
+        self.rect.x = self.x
+        self.collide_with_walls('x')
+        self.rect.y = self.y
+        self.collide_with_walls('y')
+        # self.rect.x = self.x * TILESIZE
+        # self.rect.y = self.y * TILESIZE

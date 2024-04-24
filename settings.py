@@ -19,3 +19,11 @@ MOB_HIT_RECT = pg.Rect(0,0,96,96)
 FPS = 30
 
 PLAYER_SPEED = 300
+
+SPRITESHEET = "theBell.png"
+
+TITLE = "Sprite"
+FONT_NAME = "Times New Roman"
+BGCOLOR = (0,0,0)
+WHITE = (255,255,255)
+
