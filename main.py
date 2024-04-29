@@ -7,6 +7,7 @@ from sprites import *
 import sys
 from random import randint
 from os import path
+from tilemap import *
 
 from math import floor
 
@@ -27,6 +28,13 @@ Gameplay goal: Level progression
 Secondary goal: add weapons and enemy health
 
 '''
+
+map1 = "map1.txt"
+map2 = "map2.txt"
+map3 = "map3.txt"
+map4 = "map4.txt"
+
+maps = [map1, map2, map3, map4]
 
 # create the health bar above player
 def draw_health_bar(surf, x, y, pct):
@@ -81,15 +89,18 @@ class Game:
         pg.key.set_repeat(500,100)
         self.running = True
         # stores game info with this, ex. high scores
-        self.load_data()
         self.playing = True
+        self.paused = False
+        self.current_map = 0
+        self.load_data()
     
     # importing map data from the file map.txt
     # import images to sprites
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'images')
-        self.player_img = pg.image.load(path.join(img_folder, 'monkey.png')).convert_alpha()
+        # self.player_img = pg.image.load(path.join(img_folder, 'monkey.png')).convert_alpha()
+        self.map = Map(path.join(game_folder, maps[self.current_map]))
         self.mob1_img = pg.image.load(path.join(img_folder, 'mob1.png')).convert_alpha()
         self.banana_img = pg.image.load(path.join(img_folder, 'banana.png')).convert_alpha()
         self.wall_img = pg.image.load(path.join(img_folder, 'wall.jpg')).convert_alpha()
@@ -97,7 +108,7 @@ class Game:
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
         self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
         self.teleport_img = pg.image.load(path.join(img_folder, 'teleport.png')).convert_alpha()
-        self.map_data = []
+        # self.map_data = []
  
         '''
         with is a context manager, helps close or release resources
@@ -105,13 +116,50 @@ class Game:
     
         '''
         # open map.txt and add lines into list (line)
-        with open (path.join(game_folder, 'map1.txt'), 'rt') as f:
+        # with open (path.join(game_folder, 'map1.txt'), 'rt') as f:
+            # for line in f:
+                # print(line)
+                # self.map_data.append(line)
+
+    def change_map(self, lvl):
+        # kill all existing sprites first to save memory
+        for s in self.all_sprites:
+            s.kill()
+        # reset criteria for changing level
+        self.player.moneybag = 0
+        # reset map data list to empty
+        self.map_data = []
+        # open next level
+        with open(path.join(self.game_folder, lvl), 'rt') as f:
             for line in f:
                 print(line)
                 self.map_data.append(line)
-
+        # repopulate the level with stuff
+        for row, tiles in enumerate(self.map_data):
+            print(row)
+            for col, tile in enumerate(tiles):
+                print(col)
+                if tile == 'x':
+                    print("a wall at", row, col)
+                    Wall(self, col, row)
+                if tile == 'p':
+                    self.player = Player(self, col, row)
+                if tile == 'm':
+                    Mob(self,col,row)
+                if tile == 'C':
+                    Coin(self,col,row)
+                if tile == 's':
+                    speedpotion(self,col,row)
+                if tile == 'h':
+                    healthpotion(self,col,row)
+                if tile == 'o':
+                    poisoncloud(self,col,row)
+                if tile == 't':
+                    Teleport(self,col,row)
+    
     # add sprite classes to Group
     def new(self):
+        self.load_data()
         self.test_timer = Cooldown()
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
@@ -134,7 +182,7 @@ class Game:
         # might print walls
         
         # set locations for different sprites
-        for row, tiles in enumerate(self.map_data):
+        for row, tiles in enumerate(self.map.data):
             print(row)
             for col, tile in enumerate(tiles):
                 print(col)
@@ -184,6 +232,9 @@ class Game:
         self.all_sprites.update()
         if self.player.health < 1:
             self.playing = False  
+        if self.player.moneybag == 10:
+            self.current_map += 1
+            self.change_map(maps[self.current_map])
 
     # draws the grid for our game
     def draw_grid(self):

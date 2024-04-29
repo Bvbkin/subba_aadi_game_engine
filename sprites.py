@@ -7,13 +7,15 @@ from random import randint
 from os import path
 from pygame.sprite import Sprite
 
-'''
+
 dir = path.dirname(__file__)
 img_dir = path.join(dir, 'images')
-'''
 
 # creates vectors for movement
 vec = pg.math.Vector2
+
+game_folder = path.dirname(__file__)
+img_folder = path.join(game_folder, 'images')
 
 # write a player class
 class Player(pg.sprite.Sprite):
@@ -22,8 +24,16 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         # self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image = game.player_img
+        # self.image = game.player_img
         # self.image.fill(GREEN)
+        self.spritesheet = Spritesheet(path.join(img_folder, SPRITESHEET))
+        self.load_images()
+        self.image = self.standing_frames[0]
+        self.current_frame = 0
+        self.last_update = 0
+        self.material = True
+        self.jumping = False
+        self.walking = False
         self.rect = self.image.get_rect()
         self.vx = 0
         self.vy = 0
@@ -147,6 +157,33 @@ class Player(pg.sprite.Sprite):
                 self.vy = 0
                 self.rect.y = self.y
 
+    def load_images(self):
+        self.standing_frames = [self.spritesheet.get_image(0,0, 32, 32), 
+                                self.spritesheet.get_image(32,0, 32, 32),
+
+                                ]
+        self.walking_frames = [
+                                self.spritesheet.get_image(64,0, 32, 32),
+                                self.spritesheet.get_image(96,0, 32, 32),
+                                ]
+        # for frame in self.standing_frames:
+        #     frame.set_colorkey(BLACK)
+
+        # add other frame sets for different poses etc.
+
+    def animate(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+            bottom = self.rect.bottom
+            if not self.walking:
+                self.image = self.standing_frames[self.current_frame]
+            else:
+                self.image = self.walking_frames[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+
     # old motion
 
     # player movement 
@@ -162,6 +199,8 @@ class Player(pg.sprite.Sprite):
     def update(self):
         # self.rect.x = self.x
         # self.rect.y = self.y
+        self.animate()
+        self.get_keys()
         self.get_keys()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
@@ -575,9 +614,6 @@ class poisoncloud(pg.sprite.Sprite):
         self.collide_with_walls('y')
         # self.rect.x = self.x * TILESIZE
         # self.rect.y = self.y * TILESIZE
-
-dir = path.dirname(__file__)
-img_dir = path.join(dir, 'images')
 
 class Spritesheet:
     # utility class for loading and parsing spritesheets
