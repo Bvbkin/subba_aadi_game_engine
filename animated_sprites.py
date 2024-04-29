@@ -1,4 +1,5 @@
 # create a loop that loops through the list over and over
+'''
 import pygame as pg
 
 frames = ["frame1", "frame2", "frame3", "frame4"]
@@ -20,6 +21,6 @@ while True:
         then = now
 # x is now 4
 # print(frames[x])
-
+'''
 
 

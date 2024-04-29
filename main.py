@@ -130,7 +130,7 @@ class Game:
         # reset map data list to empty
         self.map_data = []
         # open next level
-        with open(path.join(self.game_folder, lvl), 'rt') as f:
+        with open(path.join(game_folder, lvl), 'rt') as f:
             for line in f:
                 print(line)
                 self.map_data.append(line)
@@ -172,7 +172,6 @@ class Game:
         self.sword = pg.sprite.Group()
         self.poisoncloud = pg.sprite.Group()
         self.teleport = pg.sprite.Group()
-        self.animated_sprite = Animated_sprite()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -203,7 +202,6 @@ class Game:
                     poisoncloud(self,col,row)
                 if tile == 't' and self.player.moneybag == 10:
                     Teleport(self,col,row)
-        self.all_sprites.add(self.animated_sprite)
         self.run()
 
     # runs the game, game won't run without it
