@@ -108,6 +108,8 @@ class Game:
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
         self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
         self.teleport_img = pg.image.load(path.join(img_folder, 'teleport.png')).convert_alpha()
+        # self.background_img = pg.image.load(path.join(img_folder, 'background.jpg')).convert_alpha()
+        # self.background_rect = self.background_img.get_rect()
         # self.map_data = []
  
         '''
@@ -120,7 +122,7 @@ class Game:
             # for line in f:
                 # print(line)
                 # self.map_data.append(line)
-
+    
     def change_map(self, lvl):
         # kill all existing sprites first to save memory
         for s in self.all_sprites:
@@ -154,8 +156,6 @@ class Game:
                     healthpotion(self,col,row)
                 if tile == 'o':
                     poisoncloud(self,col,row)
-                if tile == 't':
-                    Teleport(self,col,row)
     
     # add sprite classes to Group
     def new(self):
@@ -200,8 +200,6 @@ class Game:
                     healthpotion(self,col,row)
                 if tile == 'o':
                     poisoncloud(self,col,row)
-                if tile == 't' and self.player.moneybag == 10:
-                    Teleport(self,col,row)
         self.run()
 
     # runs the game, game won't run without it
@@ -215,7 +213,20 @@ class Game:
             self.update()
             # output
             self.draw()
-    
+
+            if self.player.moneybag == 10:
+                for row, tiles in enumerate(self.map.data):
+                    print(row)
+                    for col, tile in enumerate(tiles):
+                        print(col)
+                        if tile == 't':
+                            Teleport(self,col,row)
+            
+            '''
+            if Player.collide_with_group(self.game.teleport, True):
+                self.current_map += 1
+                self.change_map(maps[self.current_map])
+            '''
     # quits the game when you click the red x
     def quit(self):
         pg.quit()

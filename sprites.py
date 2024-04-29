@@ -7,7 +7,6 @@ from random import randint
 from os import path
 from pygame.sprite import Sprite
 
-
 dir = path.dirname(__file__)
 img_dir = path.join(dir, 'images')
 
@@ -147,6 +146,8 @@ class Player(pg.sprite.Sprite):
                 self.health -= 4
             if str(hits[0].__class__.__name__) == "poisoncloud":
                 self.health -= 5
+            if str(hits[0].__class__.__name__) == "teleport":
+                pass
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
@@ -228,6 +229,7 @@ class Player(pg.sprite.Sprite):
         self.collide_with_group(self.game.healthpotion, True)
         self.collide_with_group(self.game.mobs, False)
         self.collide_with_group(self.game.poisoncloud, False)
+        self.collide_with_group(self.game.teleport, True)
         # coin_hits = pg.sprite.spritecollide(self.game.coins, True)
         # if coin_hits:
         #     print("I got a coin")
@@ -642,27 +644,6 @@ class Teleport(pg.sprite.Sprite):
         self.x = x * TILESIZE
         self.y = y * TILESIZE
 
-    # collision for teleport & walls
-    def collide_with_walls(self, dir):
-        if dir == 'x':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
-                if self.vx > 0:
-                    self.x = hits[0].rect.left - self.rect.width
-                if self.vx < 0:
-                    self.x = hits[0].rect.right
-                self.vx = 0
-                self.rect.x = self.x
-        if dir == 'y':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
-            if hits:
-                if self.vy > 0:
-                    self.y = hits[0].rect.top - self.rect.height
-                if self.vy < 0:
-                    self.y = hits[0].rect.bottom
-                self.vy = 0
-                self.rect.y = self.y
-
     # UPDATE THE UPDATE
     def update(self):
         # self.rect.x = self.x
@@ -670,8 +651,6 @@ class Teleport(pg.sprite.Sprite):
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x
-        self.collide_with_walls('x')
         self.rect.y = self.y
-        self.collide_with_walls('y')
         # self.rect.x = self.x * TILESIZE
         # self.rect.y = self.y * TILESIZE
