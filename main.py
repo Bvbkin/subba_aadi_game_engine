@@ -108,7 +108,7 @@ class Game:
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
         self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
         self.teleport_img = pg.image.load(path.join(img_folder, 'teleport.png')).convert_alpha()
-        # self.background_img = pg.image.load(path.join(img_folder, 'background.jpg')).convert_alpha()
+        # self.background_img = pg.image.load(path.join(img_folder, 'background.png')).convert_alpha()
         # self.background_rect = self.background_img.get_rect()
         # self.map_data = []
  
@@ -216,17 +216,12 @@ class Game:
 
             if self.player.moneybag == 10:
                 for row, tiles in enumerate(self.map.data):
-                    print(row)
+                    # print(row)
                     for col, tile in enumerate(tiles):
-                        print(col)
+                        # print(col)
                         if tile == 't':
                             Teleport(self,col,row)
-            
-            '''
-            if Player.collide_with_group(self.game.teleport, True):
-                self.current_map += 1
-                self.change_map(maps[self.current_map])
-            '''
+
     # quits the game when you click the red x
     def quit(self):
         pg.quit()
@@ -241,9 +236,19 @@ class Game:
         self.all_sprites.update()
         if self.player.health < 1:
             self.playing = False  
+        '''
         if self.player.moneybag == 10:
             self.current_map += 1
             self.change_map(maps[self.current_map])
+        '''
+        
+        if self.player.moneybag == 10:
+            if self.player.changem == True:
+                self.current_map += 1
+                self.change_map(maps[self.current_map])
+        else:
+            pass
+        
 
     # draws the grid for our game
     def draw_grid(self):

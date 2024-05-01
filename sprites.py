@@ -57,6 +57,7 @@ class Player(pg.sprite.Sprite):
         self.sword_drawn = False
         self.sword_dir = (0,0)
         self.sword = Sword(self.game, self.rect.x, self.rect.y, 16, 16, (0,0))
+        self.changem = False
 
     # sets direction
     def set_dir(self, d):
@@ -146,8 +147,8 @@ class Player(pg.sprite.Sprite):
                 self.health -= 4
             if str(hits[0].__class__.__name__) == "poisoncloud":
                 self.health -= 5
-            if str(hits[0].__class__.__name__) == "teleport":
-                pass
+            if str(hits[0].__class__.__name__) == "Teleport":
+                self.changem = True
 
     # collision for player & enemy
     def collide_with_mobs(self, dir):
