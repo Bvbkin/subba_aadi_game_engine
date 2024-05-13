@@ -3,7 +3,7 @@
 import pygame as pg
 from sys import *
 from settings import *
-from random import randint
+import random
 from os import path
 from pygame.sprite import Sprite
 
@@ -38,7 +38,7 @@ class Player(pg.sprite.Sprite):
         # self.image = pg.Surface((TILESIZE,TILESIZE))
         # self.image = game.player_img
         # self.image.fill(GREEN)
-        self.spritesheet = Spritesheet(path.join(img_folder, SPRITESHEET))
+        self.spritesheet = Spritesheet(path.join(img_folder, SPRITESHEET1))
         self.load_images()
         self.image = self.standing_frames[0]
         self.current_frame = 0
@@ -216,7 +216,6 @@ class Player(pg.sprite.Sprite):
         # self.rect.y = self.y
         self.animate()
         self.get_keys()
-        self.get_keys()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x
@@ -259,6 +258,7 @@ class Wall(pg.sprite.Sprite):
             self.speed *= -1
         # if self.rect.y > HEIGHT or self.rect.y < 0:
             # self.speed *= -1
+
 
 # creating an enemy class
 class Mob(pg.sprite.Sprite):
@@ -327,16 +327,16 @@ class Mob(pg.sprite.Sprite):
         self.collide_with_walls('y')
 
 '''
-class Mob2(pg.sprite.Sprite):
+class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         # self.image = game.mob_img
-        # self.image = pg.Surface((TILESIZE, TILESIZE))
-        # self.image.fill(ORANGE)
-        self.image = self.game.mob1_img
-        # self.image.set_colorkey(BGCOLOR)
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(ORANGE)
+        # self.image = self.game.mob_img
+        # self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
@@ -347,20 +347,42 @@ class Mob2(pg.sprite.Sprite):
         self.rot = 0
         self.chase_distance = 500
         # added
-        self.speed = 100
+        self.speed = (4,7)
         self.chasing = True
         # self.health = MOB_HEALTH
-        self.health = 5
+        self.hitpoints = MOB_HITPOINTS
+        self.hitpoints = 100
+        self.health = 100
+
+    def collide_with_walls(self, dir):
+        if dir == 'x':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vx > 0:
+                    self.x = hits[0].rect.left - self.rect.width
+                if self.vx < 0:
+                    self.x = hits[0].rect.right
+                self.vx = 0
+                self.rect.x = self.x
+        if dir == 'y':
+            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            if hits:
+                if self.vy > 0:
+                    self.y = hits[0].rect.top - self.rect.height
+                if self.vy < 0:
+                    self.y = hits[0].rect.bottom
+                self.vy = 0
+                self.rect.y = self.y
+
     def sensor(self):
         if abs(self.rect.x - self.game.player.rect.x) < self.chase_distance and abs(self.rect.y - self.game.player.rect.y) < self.chase_distance:
             self.chasing = True
         else:
             self.chasing = False
-    
     def update(self):
-        if self.health <= 0:
+        if self.hitpoints <= 0:
             self.kill()
-        # self.sensor()
+        self.sensor()
         if self.chasing:
             self.rot = (self.game.player.rect.center - self.pos).angle_to(vec(1, 0))
             self.image = pg.transform.rotate(self.game.mob1_img, self.rot)
@@ -572,9 +594,19 @@ class poisoncloud(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.poisoncloud
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        # self.image = pg.Surface((TILESIZE,TILESIZE))
-        self.image = game.poison_img
+        self.spritesheet = Spritesheet(path.join(img_folder, SPRITESHEET2))
+        self.image = pg.Surface((TILESIZE,TILESIZE))
+        # self.image = game.poison_img
         # self.image.fill(GREEN)
+        
+        self.load_images()
+        self.image = self.standing_frames[0]
+        self.current_frame = 0
+        self.last_update = 0
+        self.material = True
+        self.jumping = False
+        self.walking = False
+        
         self.rect = self.image.get_rect()
         self.vx = 0
         self.vy = 0
@@ -616,11 +648,36 @@ class poisoncloud(pg.sprite.Sprite):
                 self.vy = 0
                 self.rect.y = self.y
 
+
+    def load_images(self):
+        self.standing_frames = [self.spritesheet.get_image(0,0, 32, 32), 
+                                self.spritesheet.get_image(32,0, 32, 32),
+
+                                ]
+        self.walking_frames = [
+                                self.spritesheet.get_image(64,0, 32, 32),
+                                self.spritesheet.get_image(96,0, 32, 32),
+                                ]
+
+    def animate(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > 350:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+            bottom = self.rect.bottom
+            if not self.walking:
+                self.image = self.standing_frames[self.current_frame]
+            else:
+                self.image = self.walking_frames[self.current_frame]
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+
     # UPDATE THE UPDATE
     # calls the functions inside poison cloud and updates it
     def update(self):
         # self.rect.x = self.x
         # self.rect.y = self.y
+        self.animate()
         self.get_keys()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt

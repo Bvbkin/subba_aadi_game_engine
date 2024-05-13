@@ -8,7 +8,7 @@ import sys
 from random import randint
 from os import path
 from tilemap import *
-
+from weather import *
 from math import floor
 
 '''
@@ -35,6 +35,8 @@ map3 = "map3.txt"
 map4 = "map4.txt"
 
 maps = [map1, map2, map3, map4]
+
+weather = RandomWeather
 
 # create the health bar above player
 def draw_health_bar(surf, x, y, pct):
@@ -106,10 +108,10 @@ class Game:
         self.wall_img = pg.image.load(path.join(img_folder, 'wall.jpg')).convert_alpha()
         self.medkit_img = pg.image.load(path.join(img_folder, 'medkit.png')).convert_alpha()
         self.speedpotion_img = pg.image.load(path.join(img_folder, 'speedpotion.png')).convert_alpha()
-        self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
+        # self.poison_img = pg.image.load(path.join(img_folder, 'poisoncloud.png')).convert_alpha()
         self.teleport_img = pg.image.load(path.join(img_folder, 'teleport.png')).convert_alpha()
-        # self.background_img = pg.image.load(path.join(img_folder, 'background.png')).convert_alpha()
-        # self.background_rect = self.background_img.get_rect()
+        self.background_img = pg.image.load(path.join(img_folder, 'background.png')).convert_alpha()
+        self.background_rect = self.background_img.get_rect()
         # self.map_data = []
  
         '''
@@ -145,7 +147,7 @@ class Game:
                     print("a wall at", row, col)
                     Wall(self, col, row)
                 if tile == 'p':
-                    self.player = Player(self, col, row)
+                        self.player = Player(self, col, row)
                 if tile == 'm':
                     Mob(self,col,row)
                 if tile == 'C':
@@ -156,7 +158,7 @@ class Game:
                     healthpotion(self,col,row)
                 if tile == 'o':
                     poisoncloud(self,col,row)
-    
+
     # add sprite classes to Group
     def new(self):
         self.load_data()
@@ -172,6 +174,7 @@ class Game:
         self.sword = pg.sprite.Group()
         self.poisoncloud = pg.sprite.Group()
         self.teleport = pg.sprite.Group()
+        self.weather = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -214,14 +217,9 @@ class Game:
             # output
             self.draw()
 
-            if self.player.moneybag == 10:
-                for row, tiles in enumerate(self.map.data):
-                    # print(row)
-                    for col, tile in enumerate(tiles):
-                        # print(col)
-                        if tile == 't':
-                            Teleport(self,col,row)
-
+            self.current_weather = weather.generate_weather(self)
+            # method; tied to the class
+            
     # quits the game when you click the red x
     def quit(self):
         pg.quit()
@@ -235,17 +233,23 @@ class Game:
     def update(self):
         self.all_sprites.update()
         if self.player.health < 1:
-            self.playing = False  
-        '''
-        if self.player.moneybag == 10:
-            self.current_map += 1
-            self.change_map(maps[self.current_map])
-        '''
+            self.playing = False
         
         if self.player.moneybag == 10:
+            for row, tiles in enumerate(self.map.data):
+                # print(row)
+                for col, tile in enumerate(tiles):
+                # print(col)
+                    if tile == 't':
+                        Teleport(self,col,row)
+
+        if self.player.moneybag == 10:
             if self.player.changem == True:
-                self.current_map += 1
-                self.change_map(maps[self.current_map])
+                if self.current_map <= 3:
+                    self.current_map += 1
+                    self.change_map(maps[self.current_map])
+                elif self.current_map > 3:
+                    g.show_end_screen()
         else:
             pass
         
@@ -269,8 +273,9 @@ class Game:
 
     # paints the background black & draws grid lines
     def draw(self):
-        self.screen.fill(BGCOLOR)
-        self.draw_grid()
+        self.screen.blit(self.background_img, self.background_rect)
+        # self.screen.fill(BGCOLOR)
+        # self.draw_grid()
         self.all_sprites.draw(self.screen)
         # paints moneybag amount
         self.draw_text(self.screen, str(self.player.moneybag), 35, YELLOW, 1.5, 1)
@@ -317,6 +322,16 @@ class Game:
         else: 
             self.screen.fill(BGCOLOR)
             self.draw_text(self.screen, "You died - press any key to play again!", 50, WHITE, WIDTH/1000, HEIGHT/1000)
+            pg.display.flip()
+            self.wait_for_key()
+    
+    
+    def show_end_screen(self):
+        if self.playing == True:
+            return
+        elif self.current_map > 3:
+            self.screen.fill(BGCOLOR)
+            self.draw_text(self.screen, "You won - Good Game!", 50, WHITE, WIDTH/1000, HEIGHT/1000)
             pg.display.flip()
             self.wait_for_key()
     
