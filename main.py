@@ -10,6 +10,7 @@ from os import path
 from tilemap import *
 from weather import *
 from math import floor
+from utils import *
 
 '''
 
@@ -162,7 +163,9 @@ class Game:
     # add sprite classes to Group
     def new(self):
         self.load_data()
-        self.test_timer = Cooldown()
+        self.cooldown = Timer(self)
+        self.mob_timer = Timer(self)
+        self.mob_timer.cd = 5
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.coins = pg.sprite.Group()
@@ -217,7 +220,7 @@ class Game:
             # output
             self.draw()
 
-            self.current_weather = weather.generate_weather(self)
+            #weather.generate_weather(self)
             # method; tied to the class
             
     # quits the game when you click the red x
@@ -231,6 +234,7 @@ class Game:
 
     # updates the position of all sprites on the grid
     def update(self):
+        self.cooldown.ticking()
         self.all_sprites.update()
         if self.player.health < 1:
             self.playing = False
@@ -253,6 +257,8 @@ class Game:
         else:
             pass
         
+        weather.generate_weather(self)
+
 
     # draws the grid for our game
     def draw_grid(self):
@@ -281,6 +287,10 @@ class Game:
         self.draw_text(self.screen, str(self.player.moneybag), 35, YELLOW, 1.5, 1)
         # paints a health bar on top of player
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
+        # timer
+        self.draw_text(self.screen, str(self.cooldown.current_time), 35, RED, 29.5, 1)
+        # self.draw_text(self.screen, str(self.cooldown.get_countdown()), 35, YELLOW, 4, 1)
+        # self.draw_text(self.screen, str(self.cooldown.event_time), 35, YELLOW, 5, 1)
 
         pg.display.flip()
 
