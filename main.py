@@ -37,8 +37,6 @@ map4 = "map4.txt"
 
 maps = [map1, map2, map3, map4]
 
-weather = RandomWeather
-
 # create the health bar above player
 def draw_health_bar(surf, x, y, pct):
     if pct < 0:
@@ -134,6 +132,8 @@ class Game:
         self.player.moneybag = 0
         # reset map data list to empty
         self.map_data = []
+        # reset weather
+        self.surface = self.randomweather.generate_weather()
         # open next level
         with open(path.join(game_folder, lvl), 'rt') as f:
             for line in f:
@@ -163,6 +163,7 @@ class Game:
     # add sprite classes to Group
     def new(self):
         self.load_data()
+        self.randomweather = RandomWeather(self)
         self.cooldown = Timer(self)
         self.mob_timer = Timer(self)
         self.mob_timer.cd = 5
@@ -177,7 +178,6 @@ class Game:
         self.sword = pg.sprite.Group()
         self.poisoncloud = pg.sprite.Group()
         self.teleport = pg.sprite.Group()
-        self.weather = pg.sprite.Group()
         # self.player = Player(self,10,10)
         # self.all_sprites.add(self.player)
         
@@ -211,6 +211,7 @@ class Game:
     # runs the game, game won't run without it
     def run(self):
         self.playing = True
+        self.surface = self.randomweather.generate_weather()
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             # input
@@ -255,10 +256,7 @@ class Game:
                 elif self.current_map > 3:
                     g.show_end_screen()
         else:
-            pass
-        
-        weather.generate_weather(self)
-
+            pass   
 
     # draws the grid for our game
     def draw_grid(self):
@@ -289,6 +287,7 @@ class Game:
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
         # timer
         self.draw_text(self.screen, str(self.cooldown.current_time), 35, RED, 29.5, 1)
+        self.screen.blit(self.surface, (0, 0))
         # self.draw_text(self.screen, str(self.cooldown.get_countdown()), 35, YELLOW, 4, 1)
         # self.draw_text(self.screen, str(self.cooldown.event_time), 35, YELLOW, 5, 1)
 
