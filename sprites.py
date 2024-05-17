@@ -6,6 +6,7 @@ from settings import *
 import random
 from os import path
 from pygame.sprite import Sprite
+from weather import *
 
 dir = path.dirname(__file__)
 img_dir = path.join(dir, 'images')
@@ -58,6 +59,7 @@ class Player(pg.sprite.Sprite):
         self.sword_dir = (0,0)
         self.sword = Sword(self.game, self.rect.x, self.rect.y, 16, 16, (0,0))
         self.changem = False
+        # self.randomweather = RandomWeather(self)
 
     # sets direction
     def set_dir(self, d):
@@ -199,6 +201,15 @@ class Player(pg.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
 
+    '''
+    def weather_feature(self):
+        if self.randomweather.weather_number == 1:
+            print("lwinfl")
+            self.health -= 0.1
+        if self.randomweather.weather_number == 3:
+            print("jerbfjk")
+            self.speed -= 100
+    '''
     # old motion
 
     # player movement 
@@ -216,6 +227,7 @@ class Player(pg.sprite.Sprite):
         # self.rect.y = self.y
         self.animate()
         self.get_keys()
+        # self.weather_feature()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         self.rect.x = self.x

@@ -123,7 +123,6 @@ class Game:
             # for line in f:
                 # print(line)
                 # self.map_data.append(line)
-    
     def change_map(self, lvl):
         # kill all existing sprites first to save memory
         for s in self.all_sprites:
@@ -223,7 +222,7 @@ class Game:
 
             #weather.generate_weather(self)
             # method; tied to the class
-            
+   
     # quits the game when you click the red x
     def quit(self):
         pg.quit()
@@ -237,6 +236,7 @@ class Game:
     def update(self):
         self.cooldown.ticking()
         self.all_sprites.update()
+
         if self.player.health < 1:
             self.playing = False
         
@@ -287,7 +287,17 @@ class Game:
         draw_health_bar(self.screen, self.player.rect.x, self.player.rect.y-8, self.player.health)
         # timer
         self.draw_text(self.screen, str(self.cooldown.current_time), 35, RED, 29.5, 1)
-        self.screen.blit(self.surface, (0, 0))
+        if self.randomweather.weather_number == 0: 
+            self.screen.blit(self.surface, (0, 0))
+        if self.randomweather.weather_number == 1:
+            self.screen.blit(self.surface, (0, 0))
+        if self.randomweather.weather_number == 2: 
+            self.screen.blit(self.surface, (0, 0))
+        if self.randomweather.weather_number == 3:
+            self.screen.blit(self.surface, (0, 0))
+            # light_screen = pg.surface(30,30)
+            # light_screen.set_alpha(200)
+            # pg.draw.circle(light_screen, WHITE, (self.player.rect.centerx,self.player.rect.centery), 25)
         # self.draw_text(self.screen, str(self.cooldown.get_countdown()), 35, YELLOW, 4, 1)
         # self.draw_text(self.screen, str(self.cooldown.event_time), 35, YELLOW, 5, 1)
 

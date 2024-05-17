@@ -10,25 +10,33 @@ class RandomWeather:
         # self.surface = None
 
     def day(self):
-        print("The current weather is day")
+        '''
+        print("It is daytime!")
+        surface  = None
+        return surface
+        '''
         day_surface = pg.Surface((WIDTH, HEIGHT))
         day_surface.fill(YELLOW)  # Fill the surface with a fog color
-        day_surface.set_alpha(128)  # Set the alpha value to make the surface semi-transparent
+        day_surface.set_alpha(0)  # Set the alpha value to make the surface semi-transparent
         #self.screen.blit(fog_surface, (0, 0))  # Blit the fog surface to the screen
         surface = day_surface
         return surface
-    
+        
     def rain(self):
-        print("The current weather is rain")
+        print("It started raining!")
+        # self.x = x
+        # self.y = y
+        self.speed = 5
+        self.size = 2
         rain_surface = pg.Surface((WIDTH, HEIGHT))
         rain_surface.fill(BLUE)  # Fill the surface with a fog color
         rain_surface.set_alpha(128)  # Set the alpha value to make the surface semi-transparent
-        #self.screen.blit(fog_surface, (0, 0))  # Blit the fog surface to the screen
+
         surface = rain_surface
         return surface
     
     def fog(self):
-        print("The current weather is fog")
+        print("It got foggy!")
         fog_surface = pg.Surface((WIDTH, HEIGHT))
         fog_surface.fill(FOG_COLOR)  # Fill the surface with a fog color
         fog_surface.set_alpha(230)  # Set the alpha value to make the surface semi-transparent
@@ -37,26 +45,34 @@ class RandomWeather:
         return surface
     
     def night(self):
-        print("The current weather is night")
+        
+        print("It turned night!")
         night_surface = pg.Surface((WIDTH, HEIGHT))
         night_surface.fill(BGCOLOR)  # Fill the surface with a fog color
-        night_surface.set_alpha(128)  # Set the alpha value to make the surface semi-transparent
+        night_surface.set_alpha(200)  # Set the alpha value to make the surface semi-transparent
         #self.screen.blit(fog_surface, (0, 0))  # Blit the fog surface to the screen
         surface = night_surface
         return surface
-
+    '''
+    def light_bubble(self,x, y, radius):
+        print("Light bubble appeared!")
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = (255,255,255)
+    '''
     def generate_weather(self):
         
-        weather_number = random.randint(0,3)
-        # weather_number = 2
+        self.weather_number = random.randint(0,3)
+        # self.weather_number = 0
 
-        if weather_number == 0:
+        if self.weather_number == 0:
             surface = self.day()
-        if weather_number == 1:
+        if self.weather_number == 1:
             surface = self.rain()
-        if weather_number == 2:
+        if self.weather_number == 2:
             surface = self.fog()
-        if weather_number == 3:
+        if self.weather_number == 3:
             surface = self.night()
 
         '''
@@ -70,3 +86,13 @@ class RandomWeather:
         # self.current_weather = self.weather_types[random.randint(0,3)]
         # self.current_weather = self.weather_types[2]
         return surface
+    
+class LightBubble:
+    def __init__(self, x, y, radius):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = (255, 255, 255)  # White color for the light bubble
+
+
+
